@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Papel {
+  COLABORADOR
+  PSICOLOGO
+}
+
+enum Humor {
+  MUITO_BEM
+  BEM
+  NEUTRO
+  MAL
+  MUITO_MAL
+}
+
+enum StatusConsulta {
+  AGENDADA
+  REALIZADA
+  CANCELADA
+}
+
+enum DiaSemana {
+  SEGUNDA
+  TERCA
+  QUARTA
+  QUINTA
+  SEXTA
+  SABADO
+  DOMINGO
+}
+
+model Usuario {
+  id        String   @id @default(uuid())
+  nome      String
+  email     String   @unique
+  senhaHash String   @map("senha_hash")
+  papel     Papel
+  criadoEm  DateTime @default(now()) @map("criado_em")
+
+  perfilColaborador PerfilColaborador?
+  perfilPsicologo   PerfilPsicologo?
+
+  @@map("usuario")
+}
+
+model PerfilColaborador {
+  id           String @id @default(uuid())
+  usuarioId    String @unique @map("usuario_id")
+  departamento String
+  cargo        String
+
+  usuario   Usuario            @relation(fields: [usuarioId], references: [id])
+  checkins  CheckinEmocional[]
+  consultas Consulta[]
+
+  @@map("perfil_colaborador")
+}
+
+model PerfilPsicologo {
+  id            String @id @default(uuid())
+  usuarioId     String @unique @map("usuario_id")
+  crp           String
+  especialidade String
+
+  usuario          Usuario           @relation(fields: [usuarioId], references: [id])
+  consultas        Consulta[]
+  disponibilidades Disponibilidade[]
+
+  @@map("perfil_psicologo")
+}
+
+model CheckinEmocional {
+  id            String   @id @default(uuid())
+  colaboradorId String   @map("colaborador_id")
+  humor         Humor
+  nivelEstresse Int      @map("nivel_estresse")
+  realizadoEm   DateTime @default(now()) @map("realizado_em")
+
+  colaborador PerfilColaborador @relation(fields: [colaboradorId], references: [id])
+  analise     AnaliseIa?
+
+  @@map("checkin_emocional")
+}
+
+model AnaliseIa {
+  id                  String   @id @default(uuid())
+  checkinId           String   @unique @map("checkin_id")
+  respostaIa          String   @map("resposta_ia")
+  conteudoPsicologico String   @map("conteudo_psicologico")
+  geradoEm            DateTime @default(now()) @map("gerado_em")
+
+  checkin   CheckinEmocional @relation(fields: [checkinId], references: [id])
+  consultas Consulta[]
+
+  @@map("analise_ia")
+}
+
+model Consulta {
+  id            String         @id @default(uuid())
+  colaboradorId String         @map("colaborador_id")
+  psicologoId   String         @map("psicologo_id")
+  analiseId     String?        @map("analise_id")
+  dataHora      DateTime       @map("data_hora")
+  status        StatusConsulta
+  observacoes   String?
+
+  colaborador PerfilColaborador @relation(fields: [colaboradorId], references: [id])
+  psicologo   PerfilPsicologo   @relation(fields: [psicologoId], references: [id])
+  analise     AnaliseIa?        @relation(fields: [analiseId], references: [id])
+
+  @@map("consulta")
+}
+
+model Disponibilidade {
+  id          String    @id @default(uuid())
+  psicologoId String    @map("psicologo_id")
+  diaSemana   DiaSemana @map("dia_semana")
+  horaInicio  String    @map("hora_inicio")
+  horaFim     String    @map("hora_fim")
+
+  psicologo PerfilPsicologo @relation(fields: [psicologoId], references: [id])
+
+  @@map("disponibilidade")
+}
