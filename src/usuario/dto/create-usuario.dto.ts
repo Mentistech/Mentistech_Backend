@@ -20,7 +20,7 @@ export class CreateUsuarioDto {
   email!: string;
 
   @IsString()
-  @MinLength(6)
+  @MinLength(8)
   senha!: string;
 
   @IsEnum(Papel)
