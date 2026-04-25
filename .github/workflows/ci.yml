@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Encontrar diretório do backend
+        id: find-backend
+        run: |
+          # Procura o package.json que contém "mentistech"
+          DIR=$(find . -name "package.json" -not -path "*/node_modules/*" \
+            | xargs grep -l '"mentistech"' \
+            | xargs dirname)
+          echo "dir=$DIR" >> $GITHUB_OUTPUT
+          echo "Backend encontrado em: $DIR"
+
+      - name: Instalar dependências
+        working-directory: ${{ steps.find-backend.outputs.dir }}
+        run: npm ci
+
+      - name: Gerar cliente Prisma
+        working-directory: ${{ steps.find-backend.outputs.dir }}
+        run: npx prisma generate
+
+      - name: Rodar testes unitários
+        working-directory: ${{ steps.find-backend.outputs.dir }}
+        run: npm test -- --passWithNoTests --forceExit
