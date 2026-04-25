@@ -24,9 +24,7 @@ export class UsuarioService {
 
   async update(id: string, updateUsuarioDto: UpdateUsuarioDto) {
     const { senha, ...rest } = updateUsuarioDto;
-    const data = senha
-      ? { ...rest, senhaHash: await hash(senha, 10) }
-      : rest;
+    const data = senha ? { ...rest, senhaHash: await hash(senha, 10) } : rest;
     return this.prisma.usuario.update({ where: { id }, data });
   }
 
