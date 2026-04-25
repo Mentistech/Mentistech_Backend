@@ -29,7 +29,7 @@ export class PerfilColaboradorController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.perfilColaboradorService.findOne(+id);
+    return this.perfilColaboradorService.findOne(id);
   }
 
   @Patch(':id')
@@ -37,14 +37,11 @@ export class PerfilColaboradorController {
     @Param('id') id: string,
     @Body() updatePerfilColaboradorDto: UpdatePerfilColaboradorDto,
   ) {
-    return this.perfilColaboradorService.update(
-      +id,
-      updatePerfilColaboradorDto,
-    );
+    return this.perfilColaboradorService.update(id, updatePerfilColaboradorDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.perfilColaboradorService.remove(+id);
+    return this.perfilColaboradorService.remove(id);
   }
 }

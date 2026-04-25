@@ -29,7 +29,7 @@ export class PerfilPsicologoController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.perfilPsicologoService.findOne(+id);
+    return this.perfilPsicologoService.findOne(id);
   }
 
   @Patch(':id')
@@ -37,11 +37,11 @@ export class PerfilPsicologoController {
     @Param('id') id: string,
     @Body() updatePerfilPsicologoDto: UpdatePerfilPsicologoDto,
   ) {
-    return this.perfilPsicologoService.update(+id, updatePerfilPsicologoDto);
+    return this.perfilPsicologoService.update(id, updatePerfilPsicologoDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.perfilPsicologoService.remove(+id);
+    return this.perfilPsicologoService.remove(id);
   }
 }
